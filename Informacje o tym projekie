@@ -1,0 +1,5 @@
+Porzucam ten projekt po dziesiątkach nie udanych próbach utworzenia w pełni działającej komunikacji client - server 
+Powodem jest fakt że biblioteka SFML nie nadaję się zbytnio do tego typu operacji
+Dodatkowym problemem jest fakt, że trzeba przy tym korzystać z połaczenia TCP które powoduję masę problemów
+Najprostszym rozwiązaniem jest przeniesienie ruchu sieciowego na bibliotekę Boost 
+Jednak z racji ogranioczonego czasu zamykam projekt
