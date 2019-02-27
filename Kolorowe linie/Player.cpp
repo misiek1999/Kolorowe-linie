@@ -15,8 +15,9 @@ Player::Player(sf::Vector2f startPos, sf::Color m_color):
 	head.setOrigin(basicSize * 0.5, basicSize * 0.5);
 	head.setRotation(0);
 	
-	id = curretID;
-	curretID++;
+	id = curretID++;
+	//curretID++;
+	//head.setFillColor(color);
 }
 
 Player::~Player()
@@ -49,4 +50,9 @@ inline const sf::Color Player::getColor() const
 const sf::Vector2f Player::getPossition() const
 {
 	return this->getPossition();
+}
+
+const float Player::getRadius() const
+{
+	return head.getRadius();
 }

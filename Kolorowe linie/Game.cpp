@@ -16,7 +16,7 @@ int Game::run()
 {
 	//Okno g³owne
 	sf::ContextSettings windowSetting;
-	windowSetting.antialiasingLevel = 1;
+	windowSetting.antialiasingLevel = 8;
 	sf::RenderWindow mainWindow (sf::VideoMode(640, 480), "      VIRUS 2.0.3.456  :D ",sf::Style::Close ,windowSetting);
 	mainWindow.clear(sf::Color::Black);
 	//Speeed of game
@@ -56,6 +56,10 @@ int Game::run()
 			mainBoard.turnLeft();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 			mainBoard.turnRight();
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+			mainBoard.turnLeft2();
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+			mainBoard.turnRight2();
 		//Screen generation
 		mainWindow.clear();
 		

@@ -15,6 +15,7 @@ class Board : public sf::Drawable
 	//Info about players
 	int numberOfPlayers;
 	std::vector <Player> players;
+	mutable int tick;
 	
 	//Second way to detecion colision TY Pioter for idea :D
 	mutable sf::Image imageOfBoard;
@@ -28,6 +29,8 @@ public:
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 	void turnLeft();
 	void turnRight();
+	void turnLeft2();
+	void turnRight2();
 	bool collisionWithOtherPlayers(std::vector<Player>::iterator &itr);
 
 };

@@ -21,6 +21,7 @@ public:
 	float getHeadSize();
 	const sf::Color getColor() const;
 	const sf::Vector2f getPossition() const ;
+	const float getRadius() const;
 	friend class Board;
 
 };
