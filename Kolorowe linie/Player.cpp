@@ -1,23 +1,23 @@
 #include "stdafx.h"
 #include "Player.h"
 // SOme static const 
-const float Player::basicSize = 2.0;
+const float Player::basicSize = 3.0;
 const float Player::basicSpeed = 1.5;
 static const double pi = 3.14159265359;
-int Player::curretID = 0;
 //Basic constructor 
-Player::Player(sf::Vector2f startPos, sf::Color m_color):
+Player::Player(sf::Vector2f startPos, int rotation, sf::Color m_color, int m_id) :
 	color(m_color)
 {
+	speedMod = 1;
 	head.setPosition(startPos);
 	head.setRadius(basicSize);
 	head.setFillColor(color);
-	head.setOrigin(basicSize * 0.5, basicSize * 0.5);
-	head.setRotation(0);
-	
-	id = curretID++;
-	//curretID++;
-	//head.setFillColor(color);
+	head.setOrigin(basicSize * 1, basicSize * 1);
+	head.setRotation(rotation);
+	id = m_id;
+	bodyOff = false;
+	wrongDirection = false;
+
 }
 
 Player::~Player()
@@ -25,16 +25,12 @@ Player::~Player()
 }
 void Player::move()
 {
-	head.move(sf::Vector2f(cos(head.getRotation()*pi / 180) * basicSpeed, sin(head.getRotation()*pi / 180) * basicSpeed));
+	head.move(sf::Vector2f(cos(head.getRotation()*pi / 180) * basicSpeed * speedMod, sin(head.getRotation()*pi / 180) * basicSpeed * speedMod));
 }
 
 
 void Player::test() {
-
-
-
-
-
+	// I dont know why i create this...
 }
 
 float Player::getHeadSize()
@@ -55,4 +51,15 @@ const sf::Vector2f Player::getPossition() const
 const float Player::getRadius() const
 {
 	return head.getRadius();
+}
+
+void Player::changeRadius(unsigned int multiple)
+{
+	head.setRadius(basicSize * multiple);
+}
+
+const void Player::changeSpeed(const float multiple)
+{
+	if (multiple > 0)
+		speedMod = multiple;
 }

@@ -5,6 +5,9 @@
 
 class Game
 {
+	bool nextRound(sf::RenderWindow&, Board);
+	sf::VideoMode videoSize;
+	sf::Font font;
 public:
 	Game();
 	~Game();
