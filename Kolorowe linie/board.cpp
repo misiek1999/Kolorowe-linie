@@ -33,8 +33,37 @@ Board::~Board()
 // Its basic funtion in our game
 void Board::go()
 {
+	//move players
 	for (auto itr = players.begin(); itr != players.end(); itr++)
 		itr->move();
+
+	// When player out of board 
+	if (Effect::LASER_ON)
+	{
+		//move lasers...
+		for (auto &eff : effects)
+		{
+			if (eff.getType() == Boost::type::laser)
+				eff.laser.move();
+		}
+		//Laser out of Board
+		for (auto itr = effects.begin(); itr != effects.end(); )
+		{
+			if (itr->getType() == Boost::laser)
+			{
+				float posX = itr->laser.elipse.getPosition().x;
+				float posY = itr->laser.elipse.getPosition().y;
+				float radius = (itr->laser.elipse.getRadius());
+				if (posX <(0 + radius) || posY <(0 + radius) || posX >(sizeBoard.x + radius) || posY >(sizeBoard.y + radius))
+					itr = effects.erase(itr);
+				else
+					itr++;
+			}
+			else
+				itr++;
+		}
+	}
+
 
 	// When player out of board 
 	for (auto itr = players.begin(); itr != players.end(); )
@@ -54,7 +83,14 @@ void Board::go()
 			itr = players.erase(itr);
 		else
 			itr++;
-
+	//Colision with laser
+	if(Effect::LASER_ON)
+		for (auto &eff : effects)
+			for (auto itr = players.begin(); itr != players.end(); )
+				if (eff.collisionWithLaser(itr))
+					itr = players.erase(itr);
+				else
+					itr++;
 	//PickUp booster
 	for (auto plr = players.begin(); plr!=players.end(); plr++)
 		for (auto bos = boosters.begin(); bos!= boosters.end(); )
@@ -67,51 +103,37 @@ void Board::go()
 			}
 			else
 				bos++;
-		}
-	//New boosters
+		} 
+	// Add new boost
 	if (boosters.size() < MAX_ELEMENTS && tick % 10 == 0)
 	{
-		
-		int random = rand() % 100;
-		// To jest na chwile
-		/*
-		switch (random)
-		{
-		case Boost::type::slowDown:
-			boosters.push_back(Boost(random, randomPosition()));
-			break;
-		case Boost::type::speedUp:
-			boosters.push_back(Boost(random, randomPosition()));
-			break;
-		case Boost::type::noBody:
-			boosters.push_back(Boost(random, randomPosition()));
-			break;
-		case Boost::type::wrongDirection:
-			boosters.push_back(Boost(random, randomPosition()));
-			break;
-		case Boost::type::sizeUp:
-			boosters.push_back(Boost(random, randomPosition()));
-			break;
-		case Boost::type::sizeDown:
-			boosters.push_back(Boost(random, randomPosition()));
-			break;
-		default:
-			break;
-		}
-		*/
-		boosters.push_back(Boost(random, randomPosition()));
+		int random =rand() % 70;
+		if (random < Boost::numberOfBoost)
+				boosters.push_back(Boost(random, randomPosition()));
+
 	}
 	//End of boosters
-	for (auto eff= effects.begin(); eff!=effects.end(); )
-		if (eff->endOfEffect(tick))
+	if (tick%5==0)
+		for (auto eff = effects.begin(); eff != effects.end(); )
 		{
-			auto itr = players.begin();
-			itr += eff->getPlayerID();
-			eff->remove(itr);
-			eff = effects.erase(eff);
+			if (eff->endOfEffect(tick))
+			{
+				int playerID = eff->getPlayerID();
+				auto itr = players.begin();
+				for (auto itr = players.begin(); itr != players.end(); itr++)
+					if (itr->id == playerID)
+						break;
+				if (itr == players.end())
+					eff = effects.erase(eff);
+				else
+				{
+					eff->remove(itr);
+					eff = effects.erase(eff);
+				}
+			}
+			else
+				eff++;
 		}
-		else
-			eff++;
 	tick++;
 }
 
@@ -119,7 +141,7 @@ void Board::go()
 using std::pow;
 void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-	if (tick % 100 <80 )
+	if (tick % 100 <85 )
 	for (auto itr : players)
 	{
 		if (itr.bodyOff == false)
@@ -135,17 +157,23 @@ void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 							this->imageOfBoard.setPixel(x, y, itr.head.getFillColor());
 		}
 	}
-
+	//Draw board
 	textureOfBoard.loadFromImage(imageOfBoard);
 	spiriteOfBoard.setTexture(textureOfBoard, true);
 	target.draw(spiriteOfBoard);
 	//draw all heads
 	for (auto itr : players)
 		target.draw(itr.head);
-
+	//draw booster
 	for (auto itr : boosters)
 	{
 		target.draw(itr.sprite);
+	}
+	//draw laser shoot
+	for (auto itr : effects)
+	{
+		if (Boost::type::laser == itr.getType() && Effect::LASER_ON == true)
+			target.draw(itr.laser.elipse);
 	}
 }
 
@@ -157,7 +185,7 @@ void Board::turnLeft()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 			if (itr->id == 0)
-				itr->head.rotate(-ROTATE);
+				itr->head.rotate(-ROTATE * itr->speedMod);
 	}
 }
 void Board::turnRight()
@@ -168,7 +196,7 @@ void Board::turnRight()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 		if (itr->id == 0)
-			itr->head.rotate(ROTATE);
+			itr->head.rotate(ROTATE* itr->speedMod);
 	}
 }
 
@@ -180,7 +208,7 @@ void Board::turnLeft2()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 		if (itr->id == 1)
-			itr->head.rotate(-ROTATE);
+			itr->head.rotate(-ROTATE * itr->speedMod);
 	}
 }
 
@@ -192,20 +220,20 @@ void Board::turnRight2()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 		if (itr->id == 1)
-			itr->head.rotate(ROTATE);
+			itr->head.rotate(ROTATE* itr->speedMod);
 	}
 }
 //Now we test colision with other players
 using std::cos;
 using std::sin;
-static const double pi = 3.14159265359;
+static const double PI = 3.14159265359;
 bool Board::collisionWithOtherPlayers(std::vector<Player>::iterator &itr)
 {
 	float radius = itr->head.getRadius();
 	float x = itr->head.getPosition().x;
 	float y = itr->head.getPosition().y;
-	float posX = (cos(itr->head.getRotation()*pi / 180) * radius) + x ;
-	float posY = (sin(itr->head.getRotation()*pi / 180)  *radius) + y ;
+	float posX = (cos(itr->head.getRotation()*PI / 180) * radius) + x ;
+	float posY = (sin(itr->head.getRotation()*PI / 180) * radius) + y ;
 	if (posX > 0 && posY > 0 && posX < sizeBoard.x && posY < sizeBoard.y)
 		if (sf::Color::Black != imageOfBoard.getPixel(posX, posY))
 			return true;
@@ -215,6 +243,11 @@ bool Board::collisionWithOtherPlayers(std::vector<Player>::iterator &itr)
 bool Board::gameOver()
 {
 	return !(players.size() - 1);
+}
+
+sf::Vector2f Board::getBoardSize()
+{
+	return sizeBoard;
 }
 
 sf::Vector2f Board::randomPosition()

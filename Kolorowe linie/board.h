@@ -1,14 +1,15 @@
 #pragma once
-
 #include <SFML\Graphics.hpp>
 #include <vector>
 #include <ctime>
 #include <cmath>
 #include <cstdlib>
 #include <chrono>
+#include <algorithm>
 #include "Player.h"
 #include "Boost.h"
 #include "Effect.h"
+#include "laser.h"
 //Board where players fights 
 class Board : public sf::Drawable
 {
@@ -33,6 +34,8 @@ class Board : public sf::Drawable
 	std::vector <Boost> boosters;
 	//Game effect
 	std::vector <Effect> effects;
+	//Laser array...
+	//std::vector <laser> lasers;
 public:
 	Board(sf::Vector2u m_size);
 	~Board();
@@ -49,5 +52,7 @@ public:
 	bool collisionWithOtherPlayers(std::vector<Player>::iterator &itr);
 	//The game is end
 	bool gameOver();
+	//Get size of gameBoard
+	sf::Vector2f getBoardSize();
 };
 

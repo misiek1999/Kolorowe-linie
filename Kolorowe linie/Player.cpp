@@ -2,8 +2,8 @@
 #include "Player.h"
 // SOme static const 
 const float Player::basicSize = 3.0;
-const float Player::basicSpeed = 1.5;
-static const double pi = 3.14159265359;
+const float Player::basicSpeed = 2;
+static const double PI = 3.14159265359;
 //Basic constructor 
 Player::Player(sf::Vector2f startPos, int rotation, sf::Color m_color, int m_id) :
 	color(m_color)
@@ -25,9 +25,8 @@ Player::~Player()
 }
 void Player::move()
 {
-	head.move(sf::Vector2f(cos(head.getRotation()*pi / 180) * basicSpeed * speedMod, sin(head.getRotation()*pi / 180) * basicSpeed * speedMod));
+	head.move(sf::Vector2f(cos(head.getRotation()*PI / 180) * basicSpeed * speedMod, sin(head.getRotation()*PI / 180) * basicSpeed * speedMod));
 }
-
 
 void Player::test() {
 	// I dont know why i create this...
@@ -38,14 +37,14 @@ float Player::getHeadSize()
 	return head.getRadius();
 }
 
-inline const sf::Color Player::getColor() const
+const sf::Color Player::getColor() const
 {
 	return color;
 }
 
 const sf::Vector2f Player::getPossition() const
 {
-	return this->getPossition();
+	return this->head.getPosition();
 }
 
 const float Player::getRadius() const
@@ -53,13 +52,21 @@ const float Player::getRadius() const
 	return head.getRadius();
 }
 
-void Player::changeRadius(unsigned int multiple)
+const float Player::getRotation() const
 {
+	return head.getRotation();
+}
+
+void Player::changeRadius(float multiple)
+{
+	if (multiple * this->getRadius()<= 0)
+		return;
 	head.setRadius(basicSize * multiple);
+	head.setOrigin(head.getRadius() , head.getRadius() );
 }
 
 const void Player::changeSpeed(const float multiple)
 {
-	if (multiple > 0)
+	if (multiple  * speedMod >= 0.3)
 		speedMod = multiple;
 }

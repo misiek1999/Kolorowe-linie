@@ -157,6 +157,7 @@
     <ClInclude Include="collision.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="laser.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Kolorowe linie.cpp" />
+    <ClCompile Include="laser.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

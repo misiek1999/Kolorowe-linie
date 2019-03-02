@@ -17,7 +17,7 @@ class Player
 	bool wrongDirection;
 	
 
-	void changeRadius(unsigned int);
+	void changeRadius(float );
 	const void changeSpeed(const float multiple);
 public:
 	Player(sf::Vector2f startPos, int rotation, sf::Color m_color, int m_id);
@@ -28,6 +28,7 @@ public:
 	const sf::Color getColor() const;
 	const sf::Vector2f getPossition() const ;
 	const float getRadius() const;
+	const float getRotation() const;
 	friend class Board;
 	friend class Effect;
 };
