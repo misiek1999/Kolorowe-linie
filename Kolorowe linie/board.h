@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <algorithm>
+#include <list>
 #include "Player.h"
 #include "Boost.h"
 #include "Effect.h"
@@ -13,6 +14,10 @@
 //Board where players fights 
 class Board : public sf::Drawable
 {
+	const static unsigned int wallSize = 5;
+	const sf::Color wallColor = sf::Color::Yellow;
+	sf::RectangleShape wall;
+	sf::RectangleShape insideWall;
 	//Our board size
 	sf::Vector2f sizeBoard;
 	//Info about players
@@ -34,8 +39,7 @@ class Board : public sf::Drawable
 	std::vector <Boost> boosters;
 	//Game effect
 	std::vector <Effect> effects;
-	//Laser array...
-	//std::vector <laser> lasers;
+	void addNewEffect(std::vector<Player>::iterator &itr, unsigned int type);
 public:
 	Board(sf::Vector2u m_size);
 	~Board();

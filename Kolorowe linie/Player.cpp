@@ -28,10 +28,6 @@ void Player::move()
 	head.move(sf::Vector2f(cos(head.getRotation()*PI / 180) * basicSpeed * speedMod, sin(head.getRotation()*PI / 180) * basicSpeed * speedMod));
 }
 
-void Player::test() {
-	// I dont know why i create this...
-}
-
 float Player::getHeadSize()
 {
 	return head.getRadius();

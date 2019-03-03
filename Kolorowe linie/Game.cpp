@@ -35,7 +35,7 @@ bool Game::nextRound(sf::RenderWindow &window, Board board)
 }
 
 Game::Game():
-	videoSize(800, 600)
+	videoSize(900, 600)
 {
 	font.loadFromFile("arial.otf");
 }
@@ -55,7 +55,7 @@ int Game::run()
 	mainWindow.setFramerateLimit(60);
 	//Mapka 
 	//Board mainBoard(sf::Vector2u(mainWindow.getSize().x , mainWindow.getSize().y ));
-	Board mainBoard (mainWindow.getSize());
+	Board mainBoard (sf::Vector2u(mainWindow.getSize().x - 200, mainWindow.getSize().y));
 	sf::Event mainEvent;
 	while (mainWindow.isOpen())
 	{
@@ -84,7 +84,7 @@ int Game::run()
 		mainBoard.go();
 		if (mainBoard.gameOver())
 			if (nextRound(mainWindow, mainBoard))
-				new(&mainBoard) Board(mainWindow.getSize());
+				new(&mainBoard) Board(sf::Vector2u(mainWindow.getSize().x - 200, mainWindow.getSize().y));
 			else
 				return 0;
 		mainWindow.draw(mainBoard);

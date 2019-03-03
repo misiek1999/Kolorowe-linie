@@ -3,6 +3,29 @@
 #include <iostream>
 // Some static const 
 static const int  ROTATE = 4;
+//TODO skoñczyæ to 
+void Board::addNewEffect(std::vector<Player>::iterator & itr, unsigned int type)
+{
+	/*
+	Effect temp(itr, type, tick);
+	for (auto eff = effects.begin(); eff !=effects.end(); eff++)
+		//size_t i = effects.size()-1; i>=0; i--)
+	{
+		if (eff == effects.end() || eff + 1 == effects.end())
+		{
+			effects.push_back(Effect(itr, type, tick));
+			break;
+		}
+		if (eff->getTimeToEnd(tick) > temp.getTimeToEnd(tick))
+		{
+			effects.insert(eff, Effect(itr, type, tick));
+			break;
+		}
+	}
+	*/
+	effects.push_back(Effect(itr, type, tick));
+	std::sort(effects.begin(), effects.end());
+}
 
 //Main constructor
 //
@@ -20,6 +43,13 @@ Board::Board(sf::Vector2u m_size):
 	
 	//Now we create our background
 	imageOfBoard.create(1000,1000, sf::Color::Black);
+	//
+	wall.setSize(sizeBoard);
+	wall.setSize(sf::Vector2f(sizeBoard.x - 2 * wallSize, sizeBoard.y - 2 * wallSize));
+	wall.setFillColor(sf::Color::Black);
+	wall.setOutlineColor(sf::Color::Yellow);
+	wall.setOutlineThickness(wallSize);
+	wall.setPosition(wallSize, wallSize);
 
 	//And finaly we start our clock
 	StartTime = std::chrono::system_clock::now();
@@ -29,6 +59,8 @@ Board::Board(sf::Vector2u m_size):
 Board::~Board()
 {
 	players.clear();
+	boosters.clear();
+	effects.clear();
 }
 // Its basic funtion in our game
 void Board::go()
@@ -83,6 +115,7 @@ void Board::go()
 			itr = players.erase(itr);
 		else
 			itr++;
+
 	//Colision with laser
 	if(Effect::LASER_ON)
 		for (auto &eff : effects)
@@ -98,12 +131,14 @@ void Board::go()
 			//Colision
 			if (plr->head.getGlobalBounds().intersects(bos->sprite.getGlobalBounds()))
 			{
-				effects.push_back(Effect(plr, bos->myID, tick));
+				//effects.push_back(Effect(plr, bos->myID, tick));
+				addNewEffect(plr, bos->myID);
 				bos = boosters.erase(bos);
 			}
 			else
 				bos++;
 		} 
+
 	// Add new boost
 	if (boosters.size() < MAX_ELEMENTS && tick % 10 == 0)
 	{
@@ -114,13 +149,13 @@ void Board::go()
 	}
 	//End of boosters
 	if (tick%5==0)
-		for (auto eff = effects.begin(); eff != effects.end(); )
-		{
-			if (eff->endOfEffect(tick))
+	{
+		auto eff = effects.begin();
+			if (eff != effects.end() && eff->isEnd(tick))
 			{
 				int playerID = eff->getPlayerID();
 				auto itr = players.begin();
-				for (auto itr = players.begin(); itr != players.end(); itr++)
+				for (; itr != players.end(); itr++)
 					if (itr->id == playerID)
 						break;
 				if (itr == players.end())
@@ -131,9 +166,7 @@ void Board::go()
 					eff = effects.erase(eff);
 				}
 			}
-			else
-				eff++;
-		}
+	}
 	tick++;
 }
 
@@ -141,14 +174,15 @@ void Board::go()
 using std::pow;
 void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-	if (tick % 100 <85 )
-	for (auto itr : players)
+	target.draw(wall);
+	if (tick % 100 <90 )
+	for (auto &itr : players)
 	{
 		if (itr.bodyOff == false)
 		{
 			float posX = itr.head.getPosition().x;
 			float posY = itr.head.getPosition().y;
-			float radius = itr.head.getRadius();
+			float radius = itr.getRadius();
 			//Now some drawing pixel
 			for (float x = posX - radius; x != posX + radius; x++)
 				for (float y = posY - radius; y != posY + radius; y++)
@@ -158,8 +192,10 @@ void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 		}
 	}
 	//Draw board
-	textureOfBoard.loadFromImage(imageOfBoard);
+	textureOfBoard.loadFromImage(imageOfBoard, sf::IntRect(wallSize, wallSize, sizeBoard.x - 2*wallSize, sizeBoard.y - 2*wallSize));
+	textureOfBoard.setSmooth(true);
 	spiriteOfBoard.setTexture(textureOfBoard, true);
+	spiriteOfBoard.setPosition(wallSize, wallSize);
 	target.draw(spiriteOfBoard);
 	//draw all heads
 	for (auto itr : players)
@@ -185,7 +221,7 @@ void Board::turnLeft()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 			if (itr->id == 0)
-				itr->head.rotate(-ROTATE * itr->speedMod);
+				itr->head.rotate(-ROTATE * itr->speedMod * mod);
 	}
 }
 void Board::turnRight()
@@ -196,10 +232,9 @@ void Board::turnRight()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 		if (itr->id == 0)
-			itr->head.rotate(ROTATE* itr->speedMod);
+			itr->head.rotate(ROTATE* itr->speedMod* mod);
 	}
 }
-
 void Board::turnLeft2()
 {
 	int mod = 1;
@@ -208,10 +243,9 @@ void Board::turnLeft2()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 		if (itr->id == 1)
-			itr->head.rotate(-ROTATE * itr->speedMod);
+			itr->head.rotate(-ROTATE * itr->speedMod* mod);
 	}
 }
-
 void Board::turnRight2()
 {
 	int mod = 1;
@@ -220,7 +254,7 @@ void Board::turnRight2()
 		if (itr->wrongDirection == true)
 			mod *= -1;
 		if (itr->id == 1)
-			itr->head.rotate(ROTATE* itr->speedMod);
+			itr->head.rotate(ROTATE* itr->speedMod* mod);
 	}
 }
 //Now we test colision with other players
@@ -229,7 +263,7 @@ using std::sin;
 static const double PI = 3.14159265359;
 bool Board::collisionWithOtherPlayers(std::vector<Player>::iterator &itr)
 {
-	float radius = itr->head.getRadius();
+	float radius = itr->head.getRadius() + 1;
 	float x = itr->head.getPosition().x;
 	float y = itr->head.getPosition().y;
 	float posX = (cos(itr->head.getRotation()*PI / 180) * radius) + x ;
@@ -239,10 +273,10 @@ bool Board::collisionWithOtherPlayers(std::vector<Player>::iterator &itr)
 			return true;
 	return false;
 }
-
+//Rebuild this method
 bool Board::gameOver()
 {
-	return !(players.size() - 1);
+	return players.size() <= 1;
 }
 
 sf::Vector2f Board::getBoardSize()
@@ -252,8 +286,8 @@ sf::Vector2f Board::getBoardSize()
 
 sf::Vector2f Board::randomPosition()
 {
-	int x = int(rand()) %(int)sizeBoard.x;
-	int y = int(rand()) %(int)sizeBoard.y;
+	int x = int(rand()) % ((int)sizeBoard.x - 2 * wallSize) + wallSize;
+	int y = int(rand()) % ((int)sizeBoard.y - 2 * wallSize) + wallSize;
 	return sf::Vector2f(x,y);
 }
 

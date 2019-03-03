@@ -11,7 +11,6 @@ class Player
 	static const float basicSize;
 	static const float basicSpeed;
 	int id;
-	int points;
 	float speedMod;
 	bool bodyOff;
 	bool wrongDirection;
@@ -23,7 +22,6 @@ public:
 	Player(sf::Vector2f startPos, int rotation, sf::Color m_color, int m_id);
 	~Player();
 	void move();
-	void test();
 	float getHeadSize();
 	const sf::Color getColor() const;
 	const sf::Vector2f getPossition() const ;
