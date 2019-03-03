@@ -3,32 +3,13 @@
 #include <iostream>
 // Some static const 
 static const int  ROTATE = 4;
-//TODO skoñczyæ to 
 void Board::addNewEffect(std::vector<Player>::iterator & itr, unsigned int type)
 {
-	/*
-	Effect temp(itr, type, tick);
-	for (auto eff = effects.begin(); eff !=effects.end(); eff++)
-		//size_t i = effects.size()-1; i>=0; i--)
-	{
-		if (eff == effects.end() || eff + 1 == effects.end())
-		{
-			effects.push_back(Effect(itr, type, tick));
-			break;
-		}
-		if (eff->getTimeToEnd(tick) > temp.getTimeToEnd(tick))
-		{
-			effects.insert(eff, Effect(itr, type, tick));
-			break;
-		}
-	}
-	*/
 	effects.push_back(Effect(itr, type, tick));
 	std::sort(effects.begin(), effects.end());
 }
 
 //Main constructor
-//
 Board::Board(sf::Vector2u m_size):
 	sizeBoard(m_size)
 {
@@ -286,8 +267,8 @@ sf::Vector2f Board::getBoardSize()
 
 sf::Vector2f Board::randomPosition()
 {
-	int x = int(rand()) % ((int)sizeBoard.x - 2 * wallSize) + wallSize;
-	int y = int(rand()) % ((int)sizeBoard.y - 2 * wallSize) + wallSize;
+	int x = int(rand()) % ((int)sizeBoard.x - 2 * ( wallSize + distanceFromWall)) + wallSize + distanceFromWall;
+	int y = int(rand()) % ((int)sizeBoard.y - 2 * ( wallSize + distanceFromWall)) + wallSize + distanceFromWall;
 	return sf::Vector2f(x,y);
 }
 

@@ -17,7 +17,7 @@ class Board : public sf::Drawable
 	const static unsigned int wallSize = 5;
 	const sf::Color wallColor = sf::Color::Yellow;
 	sf::RectangleShape wall;
-	sf::RectangleShape insideWall;
+	static const int distanceFromWall = 15;
 	//Our board size
 	sf::Vector2f sizeBoard;
 	//Info about players
