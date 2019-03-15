@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "Effect.h"
-//Flag to disable laser in game
-
 
 Effect::Effect(std::vector<Player>::iterator &itr, unsigned int type, int tick):
 	beginTick(tick)
@@ -32,7 +30,7 @@ Effect::Effect(std::vector<Player>::iterator &itr, unsigned int type, int tick):
 		break;
 	case Boost::type::laser:
 		laser = Laser(itr);
-		durationTime = laserTime;
+		//durationTime = 3000;// laserTime;
 		break;
 	default:
 		break;
@@ -53,6 +51,7 @@ Effect::Effect(const Effect & effect)
 	this->effect = effect.effect;
 	this->beginTick = effect.beginTick;
 	this->durationTime = effect.durationTime;
+	this->laser = effect.laser;
 }
 
 Effect::~Effect()
@@ -77,17 +76,9 @@ unsigned int Effect::getPlayerID() const
 
 bool Effect::isEnd(int curretTick)
 {
-	/*
-	if (LASER_ON && effect == Boost::type::laser && curretTick - beginTick > laserTime)
-		return true;
-	if (effect == Boost::type::noBody && curretTick - beginTick > noBodyTime)
-		return true;
-		*/
 	if (curretTick - beginTick > durationTime)
 		return true;
 	return false;
-
-
 }
 
 void Effect::remove(std::vector<Player>::iterator & itr)
@@ -131,13 +122,6 @@ bool Effect::collisionWithLaser(std::vector<Player>::iterator & itr)
 }
 int Effect::getTimeToEnd(int tick)
 {
-	/*
-	if (LASER_ON && effect == Boost::type::laser)
-		return laserTime - (tick - beginTick);
-	if (effect == Boost::type::noBody )
-		return noBodyTime-(tick - beginTick);
-	return durationTick -(tick - beginTick);
-	*/
 	return durationTime - (tick - beginTick);
 }
 Boost::type Effect::getType() const

@@ -9,6 +9,24 @@ void Board::addNewEffect(std::vector<Player>::iterator & itr, unsigned int type)
 	std::sort(effects.begin(), effects.end());
 }
 
+void Board::setupWalls()
+{
+	for (auto &itr : walls)
+	{
+		itr.setFillColor(sf::Color::Yellow);
+	}
+	//1
+	walls[0].setSize(sf::Vector2f(wallSize, sizeBoard.y));
+	//2
+	walls[1].setSize(sf::Vector2f(sizeBoard.x, wallSize));
+	//3
+	walls[2].setSize(sf::Vector2f(wallSize, sizeBoard.y));
+	walls[2].setPosition(sf::Vector2f(sizeBoard.x - wallSize, 0));
+	//4
+	walls[3].setSize(sf::Vector2f(sizeBoard.x, wallSize));
+	walls[3].setPosition(sf::Vector2f(0, sizeBoard.y - wallSize));
+}
+
 //Main constructor
 Board::Board(sf::Vector2u m_size):
 	sizeBoard(m_size)
@@ -25,15 +43,17 @@ Board::Board(sf::Vector2u m_size):
 	//Now we create our background
 	imageOfBoard.create(1000,1000, sf::Color::Black);
 	//
+	this->setupWalls();
+		/*
 	wall.setSize(sizeBoard);
 	wall.setSize(sf::Vector2f(sizeBoard.x - 2 * wallSize, sizeBoard.y - 2 * wallSize));
 	wall.setFillColor(sf::Color::Black);
-	wall.setOutlineColor(sf::Color::Yellow);
+	//wall.setOutlineColor(sf::Color::Yellow);
 	wall.setOutlineThickness(wallSize);
 	wall.setPosition(wallSize, wallSize);
-
-	//And finaly we start our clock
-	StartTime = std::chrono::system_clock::now();
+	*/
+	//And finaly we start our clock //Maybe no
+	//StartTime = std::chrono::system_clock::now();
 	tick = 0;
 }
 
@@ -125,7 +145,7 @@ void Board::go()
 	{
 		int random =rand() % 70;
 		if (random < Boost::numberOfBoost)
-				boosters.push_back(Boost(random, randomPosition()));
+				boosters.push_back(Boost(6, randomPosition()));
 
 	}
 	//End of boosters
@@ -155,7 +175,7 @@ void Board::go()
 using std::pow;
 void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 {
-	target.draw(wall);
+
 	if (tick % 100 <90 )
 	for (auto &itr : players)
 	{
@@ -170,6 +190,12 @@ void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 					if (x > 0 && y > 0)		//Exception 
 						if ((pow(x - posX, 2) * pow(y - posY, 2)) <= pow(radius, 2))
 							this->imageOfBoard.setPixel(x, y, itr.head.getFillColor());
+			/* TOFIX
+			for (float x = posX - radius; x != posX + radius; x++)
+				for (float y = posY - radius; y != posY + radius; y++)
+					if (x > 0 && y > 0)
+						this->imageOfBoard.setPixel(x, y, itr.head.getFillColor());
+						*/
 		}
 	}
 	//Draw board
@@ -178,20 +204,25 @@ void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	spiriteOfBoard.setTexture(textureOfBoard, true);
 	spiriteOfBoard.setPosition(wallSize, wallSize);
 	target.draw(spiriteOfBoard);
+
+
+
 	//draw all heads
-	for (auto itr : players)
+	for (const auto &itr : players)
 		target.draw(itr.head);
 	//draw booster
-	for (auto itr : boosters)
+	for (const auto& itr : boosters)
 	{
 		target.draw(itr.sprite);
 	}
 	//draw laser shoot
-	for (auto itr : effects)
-	{
+	for (auto const & itr : effects)
 		if (Boost::type::laser == itr.getType() && Effect::LASER_ON == true)
 			target.draw(itr.laser.elipse);
-	}
+
+	//draw walls
+	for (auto const & itr : walls)
+		target.draw(itr);
 }
 
 void Board::turnLeft()

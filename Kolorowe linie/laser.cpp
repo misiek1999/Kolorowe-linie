@@ -6,11 +6,11 @@ static const double PI = 3.14159265359;
 Laser::Laser(std::vector<Player>::iterator &itr)
 {
 	elipse.setFillColor(itr->getColor());
-	elipse.setScale(2, 1);
-	elipse.setRadius(5);
-	elipse.setOrigin(10, 10);
-	elipse.setPosition(itr->getPossition());
-	elipse.setRotation(itr->getRotation());
+	//elipse.setScale(2, 1);
+	this->elipse.setRadius(5);
+	this->elipse.setOrigin(5, 5);
+	this->elipse.setPosition(itr->getPossition());
+	this->elipse.setRotation(itr->getRotation());
 }
 
 Laser::Laser()

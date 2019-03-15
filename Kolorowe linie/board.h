@@ -6,7 +6,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <algorithm>
-#include <list>
+#include <array>
+
 #include "Player.h"
 #include "Boost.h"
 #include "Effect.h"
@@ -16,12 +17,16 @@ class Board : public sf::Drawable
 {
 	const static unsigned int wallSize = 5;
 	const sf::Color wallColor = sf::Color::Yellow;
-	sf::RectangleShape wall;
+	//sf::RectangleShape wall;
+	std::array <sf::RectangleShape, 4> walls;
 	static const int distanceFromWall = 15;
 	//Our board size
 	sf::Vector2f sizeBoard;
 	//Info about players
 	int numberOfPlayers;
+	//std::<Player, 0> play;
+	//using players = std::array<Player, 0> play;
+	//Brakuje mi dobrego kontenera na to...
 	std::vector <Player> players;
 	//Time in game
 	std::chrono::time_point<std::chrono::system_clock> StartTime;
@@ -40,6 +45,7 @@ class Board : public sf::Drawable
 	//Game effect
 	std::vector <Effect> effects;
 	void addNewEffect(std::vector<Player>::iterator &itr, unsigned int type);
+	void setupWalls();
 public:
 	Board(sf::Vector2u m_size);
 	~Board();
