@@ -14,8 +14,6 @@ class Player
 	float speedMod;
 	bool bodyOff;
 	bool wrongDirection;
-	
-
 	void changeRadius(float );
 	const void changeSpeed(const float multiple);
 public:

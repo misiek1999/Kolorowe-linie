@@ -30,7 +30,7 @@ Effect::Effect(std::vector<Player>::iterator &itr, unsigned int type, int tick):
 		break;
 	case Boost::type::laser:
 		laser = Laser(itr);
-		//durationTime = 3000;// laserTime;
+		durationTime =  laserTime;
 		break;
 	default:
 		break;

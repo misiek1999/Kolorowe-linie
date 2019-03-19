@@ -22,12 +22,11 @@ class Board : public sf::Drawable
 	static const int distanceFromWall = 15;
 	//Our board size
 	sf::Vector2f sizeBoard;
-	//Info about players
-	int numberOfPlayers;
 	//std::<Player, 0> play;
 	//using players = std::array<Player, 0> play;
 	//Brakuje mi dobrego kontenera na to...
 	std::vector <Player> players;
+	std::size_t numberOfPlayer;
 	//Time in game
 	std::chrono::time_point<std::chrono::system_clock> StartTime;
 	std::chrono::time_point<std::chrono::system_clock> ActualTime;
@@ -47,22 +46,29 @@ class Board : public sf::Drawable
 	void addNewEffect(std::vector<Player>::iterator &itr, unsigned int type);
 	void setupWalls();
 public:
-	Board(sf::Vector2u m_size);
+	Board(sf::Vector2u m_size, std::size_t numberOfPlayer_ = 4);
+	//Board();
 	~Board();
 	//I know its terrible mechanic...
-	void go();
+	int go();
 	//Draw our board
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
-	//Tempolary stering
-	void turnLeft();
-	void turnRight();
-	void turnLeft2();
-	void turnRight2();
+	//Finaly we have better mechanism
+	//void turnLeft();
+	//void turnRight();
+	//void turnLeft2();
+	//void turnRight2();
+	
 	//Colision with other players
 	bool collisionWithOtherPlayers(std::vector<Player>::iterator &itr);
 	//The game is end
-	bool gameOver();
+	int gameOver();
 	//Get size of gameBoard
 	sf::Vector2f getBoardSize();
+	enum rotate {strongLeft = -3, middleLeft = -2, softLeft =-1, 
+		softRight= 1, middleRight = 2, strongRight = 3};
+
+	void changePlayerDirection(std::size_t ID, rotate direction);
+	sf::Color getPlayerColorByID(const size_t id)const;
 };
 

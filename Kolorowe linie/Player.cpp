@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "Server.h"
 // SOme static const 
 const float Player::basicSize = 3.0;
 const float Player::basicSpeed = 2;
@@ -23,6 +24,9 @@ Player::Player(sf::Vector2f startPos, int rotation, sf::Color m_color, int m_id)
 Player::~Player()
 {
 }
+
+
+
 void Player::move()
 {
 	head.move(sf::Vector2f(cos(head.getRotation()*PI / 180) * basicSpeed * speedMod, sin(head.getRotation()*PI / 180) * basicSpeed * speedMod));

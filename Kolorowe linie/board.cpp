@@ -2,7 +2,7 @@
 #include "board.h"
 #include <iostream>
 // Some static const 
-static const int  ROTATE = 4;
+static const int  ROTATE = 3;
 void Board::addNewEffect(std::vector<Player>::iterator & itr, unsigned int type)
 {
 	effects.push_back(Effect(itr, type, tick));
@@ -28,18 +28,19 @@ void Board::setupWalls()
 }
 
 //Main constructor
-Board::Board(sf::Vector2u m_size):
-	sizeBoard(m_size)
+Board::Board(sf::Vector2u m_size, std::size_t numberOfPlayer_ ):
+	sizeBoard(m_size),
+	numberOfPlayer(numberOfPlayer_)
 {
 	std::srand(time(nullptr));
-	//First all players = 2
-	numberOfPlayers = 2;
+
 	//Player ID
-	int i = 0;
+	//int i = 0;
 	//temp
-	players.push_back(Player(randomPosition(),rand() % 360, sf::Color::Red,i++));
-	players.push_back(Player(randomPosition(),rand() % 360 ,sf::Color::Blue,i++));
-	
+	//players.push_back(Player(randomPosition(),rand() % 360, sf::Color::Red,i++));
+	//players.push_back(Player(randomPosition(),rand() % 360 ,sf::Color::Blue,i++));
+	for (std::size_t i=0; i< numberOfPlayer_; i++ )
+		players.push_back(Player(randomPosition(), rand() % 360, this->getPlayerColorByID(i), i));
 	//Now we create our background
 	imageOfBoard.create(1000,1000, sf::Color::Black);
 	//
@@ -64,13 +65,16 @@ Board::~Board()
 	effects.clear();
 }
 // Its basic funtion in our game
-void Board::go()
+int Board::go()
 {
+	//ID of dead player
+	int deadPlayerID = -1;
+
 	//move players
 	for (auto itr = players.begin(); itr != players.end(); itr++)
 		itr->move();
 
-	// When player out of board 
+	// Lasers!
 	if (Effect::LASER_ON)
 	{
 		//move lasers...
@@ -104,25 +108,31 @@ void Board::go()
 		float posX = itr->head.getPosition().x;
 		float posY = itr->head.getPosition().y;
 		float radius = (itr->getRadius());
-		if (posX <(0 + radius) || posY <(0 + radius) || posX >(sizeBoard.x + radius) || posY >(sizeBoard.y + radius))
+		if (posX <(0 + radius) || posY <(0 + radius) || posX >(sizeBoard.x + radius) || posY >(sizeBoard.y + radius)) {
+			deadPlayerID = itr->id;
 			itr = players.erase(itr);
+		}
 		else
 			itr++;
 	}
-
+	if(deadPlayerID==-1)
 	//Colision with other player
 	for (auto itr = players.begin(); itr != players.end(); )
-		if (this->collisionWithOtherPlayers(itr))
+		if (this->collisionWithOtherPlayers(itr)) {
+			deadPlayerID = itr->id;
 			itr = players.erase(itr);
+		}
 		else
 			itr++;
-
+	if (deadPlayerID == -1)
 	//Colision with laser
 	if(Effect::LASER_ON)
 		for (auto &eff : effects)
 			for (auto itr = players.begin(); itr != players.end(); )
-				if (eff.collisionWithLaser(itr))
+				if (eff.collisionWithLaser(itr)){
+					deadPlayerID = itr->id;
 					itr = players.erase(itr);
+				}
 				else
 					itr++;
 	//PickUp booster
@@ -145,7 +155,7 @@ void Board::go()
 	{
 		int random =rand() % 70;
 		if (random < Boost::numberOfBoost)
-				boosters.push_back(Boost(6, randomPosition()));
+				boosters.push_back(Boost(random, randomPosition()));
 
 	}
 	//End of boosters
@@ -169,6 +179,7 @@ void Board::go()
 			}
 	}
 	tick++;
+	return deadPlayerID;
 }
 
 
@@ -224,7 +235,7 @@ void Board::draw(sf::RenderTarget & target, sf::RenderStates states) const
 	for (auto const & itr : walls)
 		target.draw(itr);
 }
-
+/*
 void Board::turnLeft()
 {
 	int mod = 1;
@@ -269,6 +280,7 @@ void Board::turnRight2()
 			itr->head.rotate(ROTATE* itr->speedMod* mod);
 	}
 }
+*/
 //Now we test colision with other players
 using std::cos;
 using std::sin;
@@ -286,7 +298,7 @@ bool Board::collisionWithOtherPlayers(std::vector<Player>::iterator &itr)
 	return false;
 }
 //Rebuild this method
-bool Board::gameOver()
+int Board::gameOver()
 {
 	return players.size() <= 1;
 }
@@ -294,6 +306,38 @@ bool Board::gameOver()
 sf::Vector2f Board::getBoardSize()
 {
 	return sizeBoard;
+}
+
+void Board::changePlayerDirection(std::size_t ID, rotate direction)
+{
+	int mod = 1;
+	for (std::vector<Player>::iterator itr = players.begin(); itr != players.end(); itr++)
+	{
+		if (itr->id == ID)
+		{
+			if (itr->wrongDirection == true)
+				mod *= -1;
+			itr->head.rotate(direction*ROTATE* itr->speedMod* mod);
+		}
+	}
+}
+
+sf::Color Board::getPlayerColorByID(const size_t id) const
+{
+	switch (id)
+	{
+	case 0: return sf::Color::Red;
+	case 1: return sf::Color::Blue;
+	case 2: return sf::Color(165, 94, 251);		//
+	case 3: return sf::Color(255, 165, 0);		//Orange
+	case 4: return sf::Color(87, 128, 170);		//
+	case 5: return sf::Color(255, 255, 240);	//Ivory
+	case 6: return sf::Color(87, 0, 0);			//
+	case 7: return sf::Color(165, 238, 194);	//Mint
+	default:
+		break;
+	}
+	return sf::Color(0,12,0);
 }
 
 sf::Vector2f Board::randomPosition()

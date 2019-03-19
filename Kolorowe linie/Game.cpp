@@ -55,7 +55,7 @@ int Game::run()
 	mainWindow.setFramerateLimit(60);
 	//Mapka 
 	//Board mainBoard(sf::Vector2u(mainWindow.getSize().x , mainWindow.getSize().y ));
-	Board mainBoard (sf::Vector2u(mainWindow.getSize().x - 200, mainWindow.getSize().y));
+	Board mainBoard (sf::Vector2u(mainWindow.getSize().x *0.8, mainWindow.getSize().y));
 	sf::Event mainEvent;
 	while (mainWindow.isOpen())
 	{
@@ -71,16 +71,19 @@ int Game::run()
 			}
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-			mainBoard.turnLeft();
+			mainBoard.changePlayerDirection(0, Board::rotate::middleLeft);
+			//mainBoard.turnLeft();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
-			mainBoard.turnRight();
+			mainBoard.changePlayerDirection(0, Board::rotate::middleRight);
+			//mainBoard.turnRight();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			mainBoard.turnLeft2();
+			mainBoard.changePlayerDirection(1, Board::rotate::middleLeft);
+			//mainBoard.turnLeft2();
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			mainBoard.turnRight2();
+			mainBoard.changePlayerDirection(1, Board::rotate::middleRight);
+			//mainBoard.turnRight2();
 		//Screen generation
 		mainWindow.clear();
-		
 		mainBoard.go();
 		if (mainBoard.gameOver())
 			if (nextRound(mainWindow, mainBoard))
